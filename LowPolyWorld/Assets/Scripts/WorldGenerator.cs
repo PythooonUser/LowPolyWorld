@@ -61,5 +61,6 @@ public class WorldGenerator : MonoBehaviour {
 		Mesh terrainMesh = TerrainGenerator.GenerateMesh (terrainHeightMap);
 
 		chunk.GetComponent<MeshFilter> ().sharedMesh = terrainMesh;
+		chunk.GetComponent<MeshCollider> ().sharedMesh = terrainMesh;
 	}
 }
