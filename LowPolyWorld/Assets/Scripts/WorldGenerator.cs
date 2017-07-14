@@ -5,25 +5,25 @@ using UnityEngine;
 public class WorldGenerator : MonoBehaviour {
 
 	[Header("Random Generator")]
-	public int seed;
-	public bool randomizeSeed;
+	public int seed = 0;
+	public bool randomizeSeed = false;
 	private System.Random randomGenerator;
 
 	[Header("World Parameters")]
-	public int chunkSize;
-	public int chunkDistance;
+	public int chunkSize = 49;
+	public int chunkDistance = 4;
 	public GameObject chunkObject;
 
 	[Header("Terrain Parameters")]
-	public float scale;
-	public float amplitude;
-	public int octaves;
+	public float noiseScale = 80f;
+	public int noiseOctaves = 5;
 	[Range(0f,1f)]
-	public float persistance;
-	public float lacunarity;
+	public float noisePersistance = 0.35f;
+	public float noiseLacunarity = 3f;
+	public float noiseAmplitude = 10f;
 
 	[Header("Editor")]
-	public bool autoUpdate;
+	public bool autoUpdate = true;
 
 	private void InitializeRandomGenerator() {
 		if (randomizeSeed) {
@@ -57,7 +57,7 @@ public class WorldGenerator : MonoBehaviour {
 		chunk.transform.position = new Vector3 (chunkIndexX * (chunkSize - 1), 0f, chunkIndexY * (chunkSize - 1));
 		chunk.transform.SetParent (transform, true);
 
-		float[,] terrainHeightMap = TerrainGenerator.GenerateHeightMap (chunkIndexX, chunkIndexY, chunkSize, scale, amplitude, octaves, persistance, lacunarity, offset);
+		float[,] terrainHeightMap = TerrainGenerator.GenerateHeightMap (chunkIndexX, chunkIndexY, chunkSize, noiseScale, noiseOctaves, noisePersistance, noiseLacunarity, noiseAmplitude, offset);
 		Mesh terrainMesh = TerrainGenerator.GenerateMesh (terrainHeightMap);
 
 		chunk.GetComponent<MeshFilter> ().sharedMesh = terrainMesh;

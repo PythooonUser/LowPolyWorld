@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class TerrainGenerator {
 
-	public static float[,] GenerateHeightMap(int chunkIndexX, int chunkIndexY, int chunkSize, float scale, float amplitudeMax, int octaves, float persistance, float lacunarity, Vector2 offset) {
+	public static float[,] GenerateHeightMap(int chunkIndexX, int chunkIndexY, int chunkSize, float noiseScale, int noiseOctaves, float noisePersistance, float noiseLacunarity, float noiseAmplitude, Vector2 offset) {
 		float chunkCenterPositionX = chunkIndexX * (chunkSize - 1);
 		float chunkCenterPositionY = chunkIndexY * (chunkSize - 1);
 
@@ -18,21 +18,21 @@ public static class TerrainGenerator {
 				float frequency = 1f;
 				float heightValue = 0f;
 
-				for (int i = 0; i < octaves; i++) {
+				for (int i = 0; i < noiseOctaves; i++) {
 					float xTransform = x + chunkCenterPositionX - halfChunkSize;
 					float yTransform = y + chunkCenterPositionY - halfChunkSize;
 
-					float xSample = xTransform / scale * frequency + offset.x;
-					float ySample = yTransform / scale * frequency + offset.y;
+					float xSample = xTransform / noiseScale * frequency + offset.x;
+					float ySample = yTransform / noiseScale * frequency + offset.y;
 
 					float perlinNoiseValue = Mathf.PerlinNoise (xSample, ySample) * 2f - 1f;
 					heightValue += perlinNoiseValue * amplitude;
 
-					amplitude *= persistance;
-					frequency *= lacunarity;
+					amplitude *= noisePersistance;
+					frequency *= noiseLacunarity;
 				}
 
-				heightMap [x, y] = heightValue * amplitudeMax;
+				heightMap [x, y] = heightValue * noiseAmplitude;
 			}
 		}
 
