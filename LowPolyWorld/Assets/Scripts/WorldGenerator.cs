@@ -63,4 +63,20 @@ public class WorldGenerator : MonoBehaviour {
 		chunk.GetComponent<MeshFilter> ().sharedMesh = terrainMesh;
 		chunk.GetComponent<MeshCollider> ().sharedMesh = terrainMesh;
 	}
+
+	private void OnValidate() {
+		if (chunkSize < 2) {
+			Debug.Log ("chunkSize is smaller than 2!");
+			chunkSize = 2;
+		}
+		else if (chunkSize > 105) {
+			Debug.Log("chunkSize is greater than 105!");
+			chunkSize = 105;
+		}
+
+		if (chunkDistance < 0) {
+			Debug.Log ("chunkDistance is smaller than 0!");
+			chunkDistance = 0;
+		}
+	}
 }
