@@ -13,6 +13,7 @@ public class WorldGenerator : MonoBehaviour {
 	public int chunkSize = 49;
 	public int chunkDistance = 4;
 	public GameObject chunkObject;
+	public float chunkUnit = 2f;
 
 	[Header("Terrain Parameters")]
 	public float noiseScale = 80f;
@@ -55,11 +56,11 @@ public class WorldGenerator : MonoBehaviour {
 	private void GenerateChunk(int chunkIndexX, int chunkIndexY, Vector2 offset) {
 		GameObject chunk = Instantiate(chunkObject);
 		chunk.name = "Chunk_" + chunkIndexX.ToString () + "_" + chunkIndexY.ToString ();
-		chunk.transform.position = new Vector3 (chunkIndexX * (chunkSize - 1), 0f, chunkIndexY * (chunkSize - 1));
+		chunk.transform.position = new Vector3 (chunkIndexX * (chunkSize - 1), 0f, chunkIndexY * (chunkSize - 1)) * chunkUnit;
 		chunk.transform.SetParent (transform, true);
 
-		float[,] terrainHeightMap = TerrainGenerator.GenerateHeightMap (chunkIndexX, chunkIndexY, chunkSize, noiseScale, noiseOctaves, noisePersistance, noiseLacunarity, noiseAmplitude, islandRadius, offset);
-		Mesh terrainMesh = TerrainGenerator.GenerateMesh (terrainHeightMap);
+		float[,] terrainHeightMap = TerrainGenerator.GenerateHeightMap (chunkIndexX, chunkIndexY, chunkSize, chunkUnit, noiseScale, noiseOctaves, noisePersistance, noiseLacunarity, noiseAmplitude, islandRadius, offset);
+		Mesh terrainMesh = TerrainGenerator.GenerateMesh (terrainHeightMap, chunkUnit);
 
 		chunk.GetComponent<MeshFilter> ().sharedMesh = terrainMesh;
 		chunk.GetComponent<MeshCollider> ().sharedMesh = terrainMesh;

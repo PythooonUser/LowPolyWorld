@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class TerrainGenerator {
 
-	public static float[,] GenerateHeightMap(int chunkIndexX, int chunkIndexY, int chunkSize, float noiseScale, int noiseOctaves, float noisePersistance, float noiseLacunarity, float noiseAmplitude, float islandRadius, Vector2 offset) {
+	public static float[,] GenerateHeightMap(int chunkIndexX, int chunkIndexY, int chunkSize, float chunkUnit, float noiseScale, int noiseOctaves, float noisePersistance, float noiseLacunarity, float noiseAmplitude, float islandRadius, Vector2 offset) {
 		float chunkCenterPositionX = chunkIndexX * (chunkSize - 1);
 		float chunkCenterPositionY = chunkIndexY * (chunkSize - 1);
 
@@ -44,7 +44,7 @@ public static class TerrainGenerator {
 		return heightMap;
 	}
 
-	public static Mesh GenerateMesh(float[,] heightMap) {
+	public static Mesh GenerateMesh(float[,] heightMap, float chunkUnit) {
 		Mesh mesh = new Mesh ();
 		mesh.name = "Generated Mesh";
 
@@ -58,19 +58,19 @@ public static class TerrainGenerator {
 
 		for (int y = 0; y < heightMapSize - 1; y++) {
 			for (int x = 0; x < heightMapSize - 1; x++) {
-				int xTransform = x - halfChunkSize;
-				int yTransform = y - halfChunkSize;
+				float xTransform = x - halfChunkSize;
+				float yTransform = y - halfChunkSize;
 
-				vertices.Add (new Vector3 (xTransform, heightMap [x, y], yTransform));
-				vertices.Add (new Vector3 (xTransform + 1, heightMap [x + 1, y + 1], yTransform + 1));
-				vertices.Add (new Vector3 (xTransform + 1, heightMap [x + 1, y], yTransform));
+				vertices.Add (new Vector3 (xTransform * chunkUnit, heightMap [x, y], yTransform * chunkUnit));
+				vertices.Add (new Vector3 ((xTransform + 1) * chunkUnit, heightMap [x + 1, y + 1], (yTransform + 1) * chunkUnit));
+				vertices.Add (new Vector3 ((xTransform + 1) * chunkUnit, heightMap [x + 1, y], yTransform * chunkUnit));
 				triangles.Add (verticeIndex);
 				triangles.Add (verticeIndex + 1);
 				triangles.Add (verticeIndex + 2);
 
-				vertices.Add (new Vector3 (xTransform, heightMap [x, y], yTransform));
-				vertices.Add (new Vector3 (xTransform, heightMap [x, y + 1], yTransform + 1));
-				vertices.Add (new Vector3 (xTransform + 1, heightMap [x + 1, y + 1], yTransform + 1));
+				vertices.Add (new Vector3 (xTransform * chunkUnit, heightMap [x, y], yTransform * chunkUnit));
+				vertices.Add (new Vector3 (xTransform * chunkUnit, heightMap [x, y + 1], (yTransform + 1) * chunkUnit));
+				vertices.Add (new Vector3 ((xTransform + 1) * chunkUnit, heightMap [x + 1, y + 1], (yTransform + 1) * chunkUnit));
 				triangles.Add (verticeIndex + 3);
 				triangles.Add (verticeIndex + 4);
 				triangles.Add (verticeIndex + 5);
