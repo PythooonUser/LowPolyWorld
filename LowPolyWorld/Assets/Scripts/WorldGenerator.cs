@@ -21,6 +21,7 @@ public class WorldGenerator : MonoBehaviour {
 	public float noisePersistance = 0.35f;
 	public float noiseLacunarity = 3f;
 	public float noiseAmplitude = 10f;
+	public float islandRadius = 60f;
 
 	[Header("Editor")]
 	public bool autoUpdate = true;
@@ -57,7 +58,7 @@ public class WorldGenerator : MonoBehaviour {
 		chunk.transform.position = new Vector3 (chunkIndexX * (chunkSize - 1), 0f, chunkIndexY * (chunkSize - 1));
 		chunk.transform.SetParent (transform, true);
 
-		float[,] terrainHeightMap = TerrainGenerator.GenerateHeightMap (chunkIndexX, chunkIndexY, chunkSize, noiseScale, noiseOctaves, noisePersistance, noiseLacunarity, noiseAmplitude, offset);
+		float[,] terrainHeightMap = TerrainGenerator.GenerateHeightMap (chunkIndexX, chunkIndexY, chunkSize, noiseScale, noiseOctaves, noisePersistance, noiseLacunarity, noiseAmplitude, islandRadius, offset);
 		Mesh terrainMesh = TerrainGenerator.GenerateMesh (terrainHeightMap);
 
 		chunk.GetComponent<MeshFilter> ().sharedMesh = terrainMesh;

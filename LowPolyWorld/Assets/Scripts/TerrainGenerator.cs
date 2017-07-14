@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class TerrainGenerator {
 
-	public static float[,] GenerateHeightMap(int chunkIndexX, int chunkIndexY, int chunkSize, float noiseScale, int noiseOctaves, float noisePersistance, float noiseLacunarity, float noiseAmplitude, Vector2 offset) {
+	public static float[,] GenerateHeightMap(int chunkIndexX, int chunkIndexY, int chunkSize, float noiseScale, int noiseOctaves, float noisePersistance, float noiseLacunarity, float noiseAmplitude, float islandRadius, Vector2 offset) {
 		float chunkCenterPositionX = chunkIndexX * (chunkSize - 1);
 		float chunkCenterPositionY = chunkIndexY * (chunkSize - 1);
 
@@ -18,10 +18,11 @@ public static class TerrainGenerator {
 				float frequency = 1f;
 				float heightValue = 0f;
 
-				for (int i = 0; i < noiseOctaves; i++) {
-					float xTransform = x + chunkCenterPositionX - halfChunkSize;
-					float yTransform = y + chunkCenterPositionY - halfChunkSize;
+				float xTransform = x + chunkCenterPositionX - halfChunkSize;
+				float yTransform = y + chunkCenterPositionY - halfChunkSize;
 
+				// Perlin Noise
+				for (int i = 0; i < noiseOctaves; i++) {
 					float xSample = xTransform / noiseScale * frequency + offset.x;
 					float ySample = yTransform / noiseScale * frequency + offset.y;
 
@@ -32,7 +33,11 @@ public static class TerrainGenerator {
 					frequency *= noiseLacunarity;
 				}
 
-				heightMap [x, y] = heightValue * noiseAmplitude;
+				// Island Mask
+				float distanceFromCenter = Mathf.Sqrt (xTransform * xTransform + yTransform * yTransform);
+				float maskValue = (islandRadius - distanceFromCenter) / islandRadius;
+
+				heightMap [x, y] = heightValue * noiseAmplitude + maskValue * noiseAmplitude;
 			}
 		}
 
@@ -55,8 +60,6 @@ public static class TerrainGenerator {
 			for (int x = 0; x < heightMapSize - 1; x++) {
 				int xTransform = x - halfChunkSize;
 				int yTransform = y - halfChunkSize;
-
-				//Debug.Log (x.ToString () + "_" + y.ToString () + " : " + heightMap [x, y].ToString ());
 
 				vertices.Add (new Vector3 (xTransform, heightMap [x, y], yTransform));
 				vertices.Add (new Vector3 (xTransform + 1, heightMap [x + 1, y + 1], yTransform + 1));
