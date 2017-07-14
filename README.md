@@ -1,2 +1,5 @@
+![Work in Progress](https://img.shields.io/badge/work-inprogress-red.svg?style=flat-square)
+
 # Low Poly World
-A low poly world.
+This is a simulation of a low poly tropical island.
+It currently features a vast and empty landscape.
