@@ -14,6 +14,9 @@ public class WorldGenerator : MonoBehaviour {
 	public int chunkDistance = 4;
 	public GameObject chunkObject;
 	public float chunkUnit = 2f;
+	private Dictionary<Vector2, GameObject> loadedChunks;
+	public Transform playerTransform;
+	private Vector2 oldChunkIndex;
 
 	[Header("Terrain Parameters")]
 	public float noiseScale = 80f;
@@ -23,6 +26,7 @@ public class WorldGenerator : MonoBehaviour {
 	public float noiseLacunarity = 3f;
 	public float noiseAmplitude = 10f;
 	public float islandRadius = 60f;
+	private Vector2 offset;
 
 	[Header("Editor")]
 	public bool autoUpdate = true;
@@ -41,19 +45,23 @@ public class WorldGenerator : MonoBehaviour {
 			DestroyImmediate(transform.GetChild(i).gameObject);
 		}
 
-		Vector2 offset = new Vector2 (
-			                 (float)randomGenerator.Next (-100000, 100000),
-			                 (float)randomGenerator.Next (-100000, 100000)
-		                 );
+		offset = new Vector2 (
+			(float)randomGenerator.Next (-100000, 100000),
+			(float)randomGenerator.Next (-100000, 100000)
+		);
+
+		loadedChunks = new Dictionary<Vector2, GameObject> ();
 
 		for (int y = -chunkDistance; y < chunkDistance + 1; y++) {
 			for (int x = -chunkDistance; x < chunkDistance + 1; x++) {
-				GenerateChunk (x, y, offset);
+				Vector2 chunkIndex = new Vector2 (x, y);
+				GameObject chunk = GenerateChunk (x, y, offset);
+				loadedChunks.Add (chunkIndex, chunk);
 			}
 		}
 	}
 
-	private void GenerateChunk(int chunkIndexX, int chunkIndexY, Vector2 offset) {
+	private GameObject GenerateChunk(int chunkIndexX, int chunkIndexY, Vector2 offset) {
 		GameObject chunk = Instantiate(chunkObject);
 		chunk.name = "Chunk_" + chunkIndexX.ToString () + "_" + chunkIndexY.ToString ();
 		chunk.transform.position = new Vector3 (chunkIndexX * (chunkSize - 1), 0f, chunkIndexY * (chunkSize - 1)) * chunkUnit;
@@ -64,6 +72,36 @@ public class WorldGenerator : MonoBehaviour {
 
 		chunk.GetComponent<MeshFilter> ().sharedMesh = terrainMesh;
 		chunk.GetComponent<MeshCollider> ().sharedMesh = terrainMesh;
+
+		return chunk;
+	}
+
+	private void Update() {
+		Vector3 playerPosition = playerTransform.position;
+		Vector2 currentChunkIndex = new Vector2 ((int)(playerPosition.x / chunkSize), (int)(playerPosition.z / chunkSize));
+
+		if (currentChunkIndex != oldChunkIndex) {
+			// Disable all chunks around oldChunk
+			for (int y = -chunkDistance + (int)oldChunkIndex.y; y < chunkDistance + (int)oldChunkIndex.y + 1; y++) {
+				for (int x = -chunkDistance + (int)oldChunkIndex.x; x < chunkDistance + (int)oldChunkIndex.x + 1; x++) {
+					Vector2 chunkIndex = new Vector2 (x, y);
+					GameObject chunk = GenerateChunk (x, y, offset);
+					loadedChunks [chunkIndex].SetActive (false);
+				}
+			}
+
+			// Enable or create new chunks around currentChunk
+			for (int y = -chunkDistance + (int)currentChunkIndex.y; y < chunkDistance + (int)currentChunkIndex.y + 1; y++) {
+				for (int x = -chunkDistance + (int)currentChunkIndex.x; x < chunkDistance + (int)currentChunkIndex.x + 1; x++) {
+					Vector2 chunkIndex = new Vector2 (x, y);
+					if (loadedChunks.ContainsKey (chunkIndex)) {
+						loadedChunks [chunkIndex].SetActive (true);
+					} else {
+						GameObject chunk = GenerateChunk (x, y, offset);
+					}
+				}
+			}
+		}
 	}
 
 	private void OnValidate() {

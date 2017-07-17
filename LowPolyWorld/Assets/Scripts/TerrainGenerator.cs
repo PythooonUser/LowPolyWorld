@@ -37,7 +37,7 @@ public static class TerrainGenerator {
 				float distanceFromCenter = Mathf.Sqrt (xTransform * xTransform + yTransform * yTransform);
 				float maskValue = (islandRadius - distanceFromCenter) / islandRadius;
 
-				heightMap [x, y] = heightValue * noiseAmplitude + maskValue * noiseAmplitude;
+				heightMap [x, y] = (heightValue + maskValue) * noiseAmplitude;
 			}
 		}
 
