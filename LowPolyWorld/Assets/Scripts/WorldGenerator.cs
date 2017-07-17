@@ -78,9 +78,30 @@ public class WorldGenerator : MonoBehaviour {
 
 	private void Update() {
 		Vector3 playerPosition = playerTransform.position;
-		Vector2 currentChunkIndex = new Vector2 ((int)(playerPosition.x / chunkSize), (int)(playerPosition.z / chunkSize));
 
-		if (currentChunkIndex != oldChunkIndex) {
+		// Get chunk index the player is currently in
+		int nX = 0;
+		while (true) {
+			if (Mathf.Abs (playerPosition.x) <= chunkSize * (nX + 0.5f)) {
+				break;
+			} else {
+				nX++;
+			}
+		}
+
+		int nY = 0;
+		while (true) {
+			if (Mathf.Abs (playerPosition.z) <= chunkSize * (nY + 0.5f)) {
+				break;
+			} else {
+				nY++;
+			}
+		}
+
+		Vector2 currentChunkIndex = new Vector2 (nX, nY);
+
+
+		if (Vector2.Distance(currentChunkIndex, oldChunkIndex) <= Mathf.Epsilon) {
 			// Disable all chunks around oldChunk
 			for (int y = -chunkDistance + (int)oldChunkIndex.y; y < chunkDistance + (int)oldChunkIndex.y + 1; y++) {
 				for (int x = -chunkDistance + (int)oldChunkIndex.x; x < chunkDistance + (int)oldChunkIndex.x + 1; x++) {
